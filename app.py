@@ -15,6 +15,66 @@ except Exception as e:
     st.error("❌ Database connection failed")
     st.write(e)
     st.stop()
+
+# -------------------------------
+# PROCESS FUNCTION
+# -------------------------------
+def process_file(file):
+    import pandas as pd
+
+    df = pd.read_excel(file)
+
+    # Clean columns
+    df.columns = (
+        df.columns.astype(str)
+        .str.strip()
+        .str.lower()
+        .str.replace(" ", "_")
+    )
+
+    # -------------------------------
+    # HANDLE FILED FILE
+    # -------------------------------
+    if "year_filed" in df.columns:
+        df["year"] = df["year_filed"]
+
+    # -------------------------------
+    # HANDLE GRANTED FILE
+    # -------------------------------
+    elif "ipr_status_year" in df.columns:
+        df["year"] = df["ipr_status_year"]
+
+    elif "unnamed:_0" in df.columns:
+        df["year"] = df["unnamed:_0"]
+
+    # -------------------------------
+    # FALLBACK → extract from date
+    # -------------------------------
+    else:
+        for col in df.columns:
+            if "date" in col:
+                df["year"] = pd.to_datetime(df[col], errors="coerce").dt.year
+
+    # -------------------------------
+    # FORCE NUMERIC
+    # -------------------------------
+    df["year"] = pd.to_numeric(df["year"], errors="coerce")
+
+    # -------------------------------
+    # STATUS
+    # -------------------------------
+    filename = file.name.lower()
+    df["status"] = "Granted" if "grant" in filename else "Filed"
+
+    # -------------------------------
+    # FINAL CLEAN
+    # -------------------------------
+    #df = df.dropna(subset=["year"])
+    df = df.dropna(how="all")
+    return df
+
+
+
 # -------------------------------
 # USER DATABASE (EDIT THIS)
 # -------------------------------
@@ -155,63 +215,6 @@ if "ipr_type" not in df.columns:
 
 df["ipr_type"] = df["ipr_type"].astype(str).str.strip().str.title()
 df["status"] = df["status"].astype(str).str.title()
-# -------------------------------
-# PROCESS FUNCTION
-# -------------------------------
-def process_file(file):
-    import pandas as pd
-
-    df = pd.read_excel(file)
-
-    # Clean columns
-    df.columns = (
-        df.columns.astype(str)
-        .str.strip()
-        .str.lower()
-        .str.replace(" ", "_")
-    )
-
-    # -------------------------------
-    # HANDLE FILED FILE
-    # -------------------------------
-    if "year_filed" in df.columns:
-        df["year"] = df["year_filed"]
-
-    # -------------------------------
-    # HANDLE GRANTED FILE
-    # -------------------------------
-    elif "ipr_status_year" in df.columns:
-        df["year"] = df["ipr_status_year"]
-
-    elif "unnamed:_0" in df.columns:
-        df["year"] = df["unnamed:_0"]
-
-    # -------------------------------
-    # FALLBACK → extract from date
-    # -------------------------------
-    else:
-        for col in df.columns:
-            if "date" in col:
-                df["year"] = pd.to_datetime(df[col], errors="coerce").dt.year
-
-    # -------------------------------
-    # FORCE NUMERIC
-    # -------------------------------
-    df["year"] = pd.to_numeric(df["year"], errors="coerce")
-
-    # -------------------------------
-    # STATUS
-    # -------------------------------
-    filename = file.name.lower()
-    df["status"] = "Granted" if "grant" in filename else "Filed"
-
-    # -------------------------------
-    # FINAL CLEAN
-    # -------------------------------
-    #df = df.dropna(subset=["year"])
-    df = df.dropna(how="all")
-    return df
-
 
 
 # SIDEBAR FILTERS
