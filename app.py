@@ -1,0 +1,360 @@
+import pandas as pd
+import streamlit as st
+import plotly.express as px
+from sqlalchemy import create_engine
+
+engine = create_engine(
+    "postgresql://postgres:jayanti@localhost:5432/gtu_patents"
+)
+uploaded_files = None
+# -------------------------------
+# USER DATABASE (EDIT THIS)
+# -------------------------------
+users = {
+    "admin": {"password": "admin123", "role": "admin"},
+    "gtu_user": {"password": "gtu123", "role": "viewer"}
+}
+
+def login():
+    st.title("🔐 Login - GTU Patent Dashboard")
+
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        if username in users and users[username]["password"] == password:
+            st.session_state["logged_in"] = True
+            st.session_state["user"] = username
+            st.session_state["role"] = users[username]["role"]
+            st.success("Login successful")
+            st.rerun()
+        else:
+            st.error("Invalid username or password")
+
+# Initialize session
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = False
+
+# If not logged in → show login page
+if not st.session_state["logged_in"]:
+    login()
+    st.stop()
+
+col1, col2 = st.columns([6,1])
+
+with col2:
+    if st.button("Logout"):
+        st.session_state["logged_in"] = False
+        st.rerun()
+       
+
+# -------------------------------
+# PAGE CONFIG
+# -------------------------------
+st.set_page_config(
+    page_title="GTU Patent Dashboard",
+    layout="wide"
+)
+
+# -------------------------------
+# HEADER
+# -------------------------------
+st.title("📊 GTU Patent Analytics Dashboard")
+st.caption("Gujarat Technological University")
+
+# -------------------------------
+# FILE UPLOAD
+# -------------------------------
+#import streamlit as st
+
+#uploaded_files = st.file_uploader("Granted_Patent",type=["xlsx"],accept_multiple_files=True)
+
+if st.session_state["role"] == "admin":
+    uploaded_files = st.file_uploader(
+        "Granted_Patent",
+        type=["xlsx"],
+        accept_multiple_files=True
+    )
+
+else:
+    st.info("Viewer mode: Upload disabled")
+
+
+# -------------------------------
+# LOAD FROM DATABASE (DEFAULT)
+# -------------------------------
+df = pd.DataFrame()
+
+try:
+    df = pd.read_sql("SELECT * FROM gtu_patents", engine)
+except:
+    pass
+
+ 
+# -------------------------------
+# PROCESS FUNCTION
+# -------------------------------
+def process_file(file):
+    import pandas as pd
+
+    df = pd.read_excel(file)
+
+    # Clean columns
+    df.columns = (
+        df.columns.astype(str)
+        .str.strip()
+        .str.lower()
+        .str.replace(" ", "_")
+    )
+
+    # -------------------------------
+    # HANDLE FILED FILE
+    # -------------------------------
+    if "year_filed" in df.columns:
+        df["year"] = df["year_filed"]
+
+    # -------------------------------
+    # HANDLE GRANTED FILE
+    # -------------------------------
+    elif "ipr_status_year" in df.columns:
+        df["year"] = df["ipr_status_year"]
+
+    elif "unnamed:_0" in df.columns:
+        df["year"] = df["unnamed:_0"]
+
+    # -------------------------------
+    # FALLBACK → extract from date
+    # -------------------------------
+    else:
+        for col in df.columns:
+            if "date" in col:
+                df["year"] = pd.to_datetime(df[col], errors="coerce").dt.year
+
+    # -------------------------------
+    # FORCE NUMERIC
+    # -------------------------------
+    df["year"] = pd.to_numeric(df["year"], errors="coerce")
+
+    # -------------------------------
+    # STATUS
+    # -------------------------------
+    filename = file.name.lower()
+    df["status"] = "Granted" if "grant" in filename else "Filed"
+
+    # -------------------------------
+    # FINAL CLEAN
+    # -------------------------------
+    #df = df.dropna(subset=["year"])
+    df = df.dropna(how="all")
+    return df
+# -------------------------------
+# PROCESS FILES
+# ------------------------------
+
+# -------------------------------
+# IF USER UPLOADS FILE → UPDATE DB
+# -------------------------------
+dataframes=[]
+if uploaded_files:
+    for file in uploaded_files:
+        try:
+            df_temp = process_file(file)
+
+            if df_temp is not None and not df_temp.empty:
+                dataframes.append(df_temp)
+                st.success(f"✅ Processed: {file.name}")
+            else:
+                st.warning(f"⚠️ No usable data in: {file.name}")
+
+        except Exception as e:
+            st.error(f"❌ Failed: {file.name}")
+            st.write(e)
+     
+if dataframes:
+    df = pd.concat(dataframes, ignore_index=True)
+    df = df.drop_duplicates()
+
+    df.to_sql("gtu_patents", engine, if_exists="replace", index=False)
+
+    st.success("✅ Database updated successfully")         
+# If no upload → load from DB
+elif df.empty:
+    try:
+        df = pd.read_sql("SELECT * FROM gtu_patents", engine)
+    except:
+        st.warning("⚠️ No data available")
+        st.stop()
+
+df = df.rename(columns={
+    "type_of_ipr_(design/patent/trademark/_gi/_copyright)": "ipr_type"
+})
+df["ipr_type"] = (
+    df["ipr_type"]
+    .astype(str)
+    .str.strip()
+    .str.title()
+)
+
+df["status"] = df["status"].astype(str).str.title()
+
+# SIDEBAR FILTERS
+# -------------------------------
+st.sidebar.header("Filters")
+
+if "year" in df.columns:
+    year_clean = df["year"].dropna()
+
+    year_list = sorted(year_clean.unique())
+
+    selected_years = st.sidebar.multiselect(
+        "Select Year",
+        year_list,
+        default=year_list
+    )
+
+    df = df[df["year"].isin(selected_years)]
+# -------------------------------
+# KPI SECTION
+# -------------------------------
+filed = len(df[df["status"] == "Filed"])
+granted = len(df[df["status"] == "Granted"])
+rate = (granted / filed * 100) if filed else 0
+
+col1, col2, col3 = st.columns(3)
+col1.metric("Filed Patents", filed)
+col2.metric("Granted Patents", granted)
+col3.metric("Grant Rate (%)", f"{rate:.2f}")
+
+st.divider()
+
+# -------------------------------
+# CHARTS
+# -------------------------------
+if "year" in df.columns:
+    year_data = df.groupby(["year", "status"]).size().reset_index(name="count")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("Filed vs Granted (Year-wise)")
+        st.plotly_chart(
+            px.bar(year_data, x="year", y="count", color="status"),
+            width="stretch"
+        )
+
+    with col2:
+        st.subheader("Trend Over Time")
+        st.plotly_chart(
+            px.line(year_data, x="year", y="count", color="status", markers=True),
+            width="stretch"
+        )
+
+# Department chart
+if "department" in df.columns:
+    st.subheader("Department-wise Distribution")
+    dept_data = df.groupby(["department", "status"]).size().reset_index(name="count")
+
+    st.plotly_chart(
+        px.bar(dept_data, x="department", y="count", color="status"),
+        width="stretch"
+    )
+
+st.divider()
+
+import plotly.express as px
+
+# -------------------------------
+# PIE CHART - IPR DISTRIBUTION
+# -------------------------------
+import plotly.express as px
+import streamlit as st
+
+st.subheader("🥧 IPR Distribution: Filed vs Granted")
+
+col1, col2 = st.columns(2)
+
+# Filed
+with col1:
+    filed_df = df[df["status"] == "Filed"]
+    filed_counts = filed_df["ipr_type"].value_counts().reset_index()
+    filed_counts.columns = ["IPR Type", "Count"]
+
+    fig1 = px.pie(
+        filed_counts,
+        names="IPR Type",
+        values="Count",
+        title="Filed IPR Distribution",
+        hole=0.4
+    )
+     # 🔥 SHOW COUNT + %
+    #fig1.update_traces(textinfo='label+percent+value')
+    st.plotly_chart(fig1,width="stretch")
+
+# Granted
+with col2:
+    granted_df = df[df["status"] == "Granted"]
+    granted_counts = granted_df["ipr_type"].value_counts().reset_index()
+    granted_counts.columns = ["IPR Type", "Count"]
+
+    fig2 = px.pie(
+        granted_counts,
+        names="IPR Type",
+        values="Count",
+        title="Granted IPR Distribution",
+        hole=0.4
+    )
+     # 🔥 SHOW COUNT + %
+    #fig2.update_traces(textinfo='label+percent+value')
+    st.plotly_chart(fig2,width="stretch")
+
+#fig1.update_traces(hovertemplate="<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}")
+
+#fig2.update_traces(hovertemplate="<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}")    
+
+status_data = df["status"].value_counts().reset_index()
+status_data.columns = ["Status", "Count"]
+
+fig = px.pie(status_data, names="Status", values="Count", hole=0.4)
+
+st.subheader("📊 Filed vs Granted Distribution")
+st.plotly_chart(fig,width="stretch")
+selected_status = st.selectbox("Select Status", ["Filed", "Granted"])
+
+filtered = df[df["status"] == selected_status]
+
+counts = filtered["ipr_type"].value_counts().reset_index()
+counts.columns = ["IPR Type", "Count"]
+
+fig = px.pie(counts, names="IPR Type", values="Count", hole=0.4)
+
+st.plotly_chart(fig, width="stretch")
+
+pivot = df.groupby(["ipr_type", "status"]).size().reset_index(name="count")
+
+fig = px.bar(
+    pivot,
+    x="ipr_type",
+    y="count",
+    color="status",
+    barmode="group",
+    title="IPR Type Distribution: Filed vs Granted"
+)
+
+st.plotly_chart(fig,width="stretch")
+# -------------------------------
+# DOWNLOAD + TABLE
+# -------------------------------
+st.subheader("📋 Patent Data")
+
+st.download_button(
+    "📥 Download Data",
+    df.to_csv(index=False),
+    file_name="gtu_patents.csv"
+)
+
+st.dataframe(df,width="stretch")
+#st.metric("Total Filed", len(filed_df))
+#st.metric("Total Granted", len(granted_df))
+#st.write(df.columns)
+#st.write("Columns:", df.columns.tolist())
+#st.write("Preview:", df.head())
