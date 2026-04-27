@@ -277,55 +277,50 @@ if "department" in df.columns:
     )
 
 st.divider()
-
-import plotly.express as px
-if "ipr_type" not in df.columns:
-    st.warning("IPR Type data not available")
-else:
-    # your chart code
 # -------------------------------
 # PIE CHART - IPR DISTRIBUTION
 # -------------------------------
-import plotly.express as px
-import streamlit as st
-
 st.subheader("🥧 IPR Distribution: Filed vs Granted")
 
-col1, col2 = st.columns(2)
+import plotly.express as px
 
-# Filed
-with col1:
-    filed_df = df[df["status"] == "Filed"]
-    filed_counts = filed_df["ipr_type"].value_counts().reset_index()
-    filed_counts.columns = ["IPR Type", "Count"]
+if "ipr_type" not in df.columns:
+    st.warning("IPR Type data not available")
 
-    fig1 = px.pie(
-        filed_counts,
-        names="IPR Type",
-        values="Count",
-        title="Filed IPR Distribution",
-        hole=0.4
-    )
-     # 🔥 SHOW COUNT + %
-    #fig1.update_traces(textinfo='label+percent+value')
-    st.plotly_chart(fig1,width="stretch")
+else:
+    col1, col2 = st.columns(2)
 
-# Granted
-with col2:
-    granted_df = df[df["status"] == "Granted"]
-    granted_counts = granted_df["ipr_type"].value_counts().reset_index()
-    granted_counts.columns = ["IPR Type", "Count"]
+    # Filed
+    with col1:
+        filed_df = df[df["status"] == "Filed"]
+        filed_counts = filed_df["ipr_type"].value_counts().reset_index()
+        filed_counts.columns = ["IPR Type", "Count"]
 
-    fig2 = px.pie(
-        granted_counts,
-        names="IPR Type",
-        values="Count",
-        title="Granted IPR Distribution",
-        hole=0.4
-    )
-     # 🔥 SHOW COUNT + %
-    #fig2.update_traces(textinfo='label+percent+value')
-    st.plotly_chart(fig2,width="stretch")
+        fig1 = px.pie(
+            filed_counts,
+            names="IPR Type",
+            values="Count",
+            title="Filed IPR Distribution",
+            hole=0.4
+        )
+
+        st.plotly_chart(fig1, width="stretch")
+
+    # Granted
+    with col2:
+        granted_df = df[df["status"] == "Granted"]
+        granted_counts = granted_df["ipr_type"].value_counts().reset_index()
+        granted_counts.columns = ["IPR Type", "Count"]
+
+        fig2 = px.pie(
+            granted_counts,
+            names="IPR Type",
+            values="Count",
+            title="Granted IPR Distribution",
+            hole=0.4
+        )
+
+        st.plotly_chart(fig2, width="stretch")
 
 #fig1.update_traces(hovertemplate="<b>%{label}</b><br>Count: %{value}<br>Percentage: %{percent}")
 
