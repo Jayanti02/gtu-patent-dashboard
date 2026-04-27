@@ -186,14 +186,13 @@ try:
 except Exception as e:
     st.warning("⚠️ Could not write to database")
     st.write(e)
-          
-# If no upload → load from DB
-elif df.empty:
+if not uploaded_files:
     try:
         df = pd.read_sql("SELECT * FROM gtu_patents", engine)
-    except:
-        st.warning("⚠️ No data available")
-        st.stop()
+    except Exception as e:
+        st.warning("⚠️ No data available in database")
+        st.write(e)
+        st.stop()         
 
 df = df.rename(columns={
     "type_of_ipr_(design/patent/trademark/_gi/_copyright)": "ipr_type"
