@@ -157,7 +157,15 @@ def process_file(file):
 # -------------------------------
 # PROCESS FILES
 # ------------------------------
+# Ensure ipr_type always exists
+if "ipr_type" not in df.columns:
+    for col in df.columns:
+        if "type" in col:
+            df["ipr_type"] = df[col]
+            break
 
+if "ipr_type" not in df.columns:
+    df["ipr_type"] = "Unknown"
 # -------------------------------
 # IF USER UPLOADS FILE → UPDATE DB
 # -------------------------------
@@ -193,17 +201,22 @@ if not uploaded_files:
         st.warning("⚠️ No data available in database")
         st.write(e)
         st.stop()         
+# Ensure required columns exist
+required_cols = ["ipr_type", "status", "year"]
 
+for col in required_cols:
+    if col not in df.columns:
+        df[col] = None
 df = df.rename(columns={
     "type_of_ipr_(design/patent/trademark/_gi/_copyright)": "ipr_type"
 })
-df["ipr_type"] = (
-    df["ipr_type"]
-    .astype(str)
-    .str.strip()
-    .str.title()
-)
-
+if "ipr_type" in df.columns:
+    df["ipr_type"] = (
+        df["ipr_type"]
+        .astype(str)
+        .str.strip()
+        .str.title()
+    )
 df["status"] = df["status"].astype(str).str.title()
 
 # SIDEBAR FILTERS
@@ -271,7 +284,10 @@ if "department" in df.columns:
 st.divider()
 
 import plotly.express as px
-
+if "ipr_type" not in df.columns:
+    st.warning("IPR Type data not available")
+else:
+    # your chart code
 # -------------------------------
 # PIE CHART - IPR DISTRIBUTION
 # -------------------------------
