@@ -2,10 +2,11 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 from sqlalchemy import create_engine
-
 engine = create_engine(
-    "postgresql://postgres:jayanti@localhost:5432/gtu_patents"
+    st.secrets["DB_URL"],
+    pool_pre_ping=True,   # helps with dropped connections
 )
+#engine = create_engine("postgresql://postgres:jayanti@localhost:5432/gtu_patents")
 uploaded_files = None
 # -------------------------------
 # USER DATABASE (EDIT THIS)
