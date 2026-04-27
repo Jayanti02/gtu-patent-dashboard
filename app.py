@@ -86,10 +86,8 @@ if st.session_state["role"] == "admin":
 
 else:
     st.info("Viewer mode: Upload disabled")
-
-
 # -------------------------------
-# LOAD FROM DATABASE (DEFAULT)
+# LOAD FROM DATABASE
 # -------------------------------
 df = pd.DataFrame()
 
@@ -98,6 +96,65 @@ try:
 except:
     pass
 
+# -------------------------------
+# PROCESS UPLOAD
+# -------------------------------
+dataframes = []
+
+if uploaded_files:
+    for file in uploaded_files:
+        try:
+            df_temp = process_file(file)
+
+            if df_temp is not None and not df_temp.empty:
+                dataframes.append(df_temp)
+                st.success(f"✅ Processed: {file.name}")
+            else:
+                st.warning(f"⚠️ No usable data in: {file.name}")
+
+        except Exception as e:
+            st.error(f"❌ Failed: {file.name}")
+            st.write(e)
+
+# -------------------------------
+# UPDATE DB IF NEW DATA
+# -------------------------------
+if dataframes:
+    df = pd.concat(dataframes, ignore_index=True)
+    df = df.drop_duplicates()
+
+    try:
+        df.to_sql("gtu_patents", engine, if_exists="replace", index=False)
+        st.success("✅ Database updated successfully")
+    except Exception as e:
+        st.warning("⚠️ Could not write to database")
+        st.write(e)
+
+# -------------------------------
+# FALLBACK (VIEWER MODE)
+# -------------------------------
+elif df.empty:
+    st.warning("⚠️ No data available")
+    st.stop()
+
+# -------------------------------
+# FINAL CLEANING (IMPORTANT)
+# -------------------------------
+df = df.rename(columns={
+    "type_of_ipr_(design/patent/trademark/_gi/_copyright)": "ipr_type"
+})
+
+if "ipr_type" not in df.columns:
+    for col in df.columns:
+        if "type" in col:
+            df["ipr_type"] = df[col]
+            break
+
+if "ipr_type" not in df.columns:
+    df["ipr_type"] = "Unknown"
+
+df["ipr_type"] = df["ipr_type"].astype(str).str.strip().str.title()
+df["status"] = df["status"].astype(str).str.title()
 # -------------------------------
 # PROCESS FUNCTION
 # -------------------------------
@@ -154,70 +211,8 @@ def process_file(file):
     #df = df.dropna(subset=["year"])
     df = df.dropna(how="all")
     return df
-# -------------------------------
-# PROCESS FILES
-# ------------------------------
-# Ensure ipr_type always exists
-if "ipr_type" not in df.columns:
-    for col in df.columns:
-        if "type" in col:
-            df["ipr_type"] = df[col]
-            break
 
-if "ipr_type" not in df.columns:
-    df["ipr_type"] = "Unknown"
-# -------------------------------
-# IF USER UPLOADS FILE → UPDATE DB
-# -------------------------------
-dataframes=[]
-if uploaded_files:
-    for file in uploaded_files:
-        try:
-            df_temp = process_file(file)
 
-            if df_temp is not None and not df_temp.empty:
-                dataframes.append(df_temp)
-                st.success(f"✅ Processed: {file.name}")
-            else:
-                st.warning(f"⚠️ No usable data in: {file.name}")
-
-        except Exception as e:
-            st.error(f"❌ Failed: {file.name}")
-            st.write(e)
-     
-if dataframes:
-    df = pd.concat(dataframes, ignore_index=True)
-    df = df.drop_duplicates()
-try:
-    df.to_sql("gtu_patents", engine, if_exists="replace", index=False)
-    st.success("✅ Database updated successfully")
-except Exception as e:
-    st.warning("⚠️ Could not write to database")
-    st.write(e)
-if not uploaded_files:
-    try:
-        df = pd.read_sql("SELECT * FROM gtu_patents", engine)
-    except Exception as e:
-        st.warning("⚠️ No data available in database")
-        st.write(e)
-        st.stop()         
-# Ensure required columns exist
-required_cols = ["ipr_type", "status", "year"]
-
-for col in required_cols:
-    if col not in df.columns:
-        df[col] = None
-df = df.rename(columns={
-    "type_of_ipr_(design/patent/trademark/_gi/_copyright)": "ipr_type"
-})
-if "ipr_type" in df.columns:
-    df["ipr_type"] = (
-        df["ipr_type"]
-        .astype(str)
-        .str.strip()
-        .str.title()
-    )
-df["status"] = df["status"].astype(str).str.title()
 
 # SIDEBAR FILTERS
 # -------------------------------
