@@ -8,6 +8,13 @@ engine = create_engine(
 )
 #engine = create_engine("postgresql://postgres:jayanti@localhost:5432/gtu_patents")
 uploaded_files = None
+try:
+    with engine.connect() as conn:
+        pass
+except Exception as e:
+    st.error("❌ Database connection failed")
+    st.write(e)
+    st.stop()
 # -------------------------------
 # USER DATABASE (EDIT THIS)
 # -------------------------------
@@ -91,7 +98,6 @@ try:
 except:
     pass
 
- 
 # -------------------------------
 # PROCESS FUNCTION
 # -------------------------------
@@ -174,10 +180,13 @@ if uploaded_files:
 if dataframes:
     df = pd.concat(dataframes, ignore_index=True)
     df = df.drop_duplicates()
-
+try:
     df.to_sql("gtu_patents", engine, if_exists="replace", index=False)
-
-    st.success("✅ Database updated successfully")         
+    st.success("✅ Database updated successfully")
+except Exception as e:
+    st.warning("⚠️ Could not write to database")
+    st.write(e)
+          
 # If no upload → load from DB
 elif df.empty:
     try:
