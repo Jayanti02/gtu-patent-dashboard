@@ -128,7 +128,23 @@ with col2:
         st.session_state["logged_in"] = False
         st.rerun()
        
+col1, col2, col3 = st.columns([1, 6, 1])
 
+with col1:
+    st.image("https://www.gtu.ac.in/images/logo.png", width=80)
+
+with col2:
+    st.markdown("""
+        <h1 style='text-align: center; color: #1f4e79;'>
+            📊 GTU Patent Analytics Dashboard
+        </h1>
+        <p style='text-align: center; font-size:18px;'>
+            Gujarat Technological University
+        </p>
+    """, unsafe_allow_html=True)
+
+with col3:
+    st.image("https://ipfc.gtu.ac.in/assets/img/ipfc_logo.png", width=80)
 # -------------------------------
 # PAGE CONFIG
 # -------------------------------
