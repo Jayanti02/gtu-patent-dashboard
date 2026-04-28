@@ -251,15 +251,16 @@ df["status"] = df["status"].astype(str).str.title()
 st.sidebar.header("Filters")
 
 if "year" in df.columns:
-    year_clean = df["year"].dropna()
+    df["year"] = df["year"].astype(int)
 
-    year_list = sorted(year_clean.unique())
+    years = sorted(df["year"].dropna().unique())
 
     selected_years = st.sidebar.multiselect(
-        "Select Year",
-        year_list,
-        default=year_list
+    "Select Year",
+    years,
+    default=years
     )
+    
 
     df = df[df["year"].isin(selected_years)]
 # -------------------------------
@@ -320,15 +321,21 @@ col5.metric("🏷 Granted Trademark", granted_tm)
 col6.metric("© Filed Copyright", filed_cr)
 col7.metric("© Granted Copyright", granted_cr)
 st.subheader("📊 Patent KPIs")
-# 3 columns
+col1, col2, col3 = st.columns(3)
+col1.metric("📥 Filed Patent", filed_patent)
+col2.metric("✅ Granted Patent", granted_patent)
+col3.metric("📊 Grant Rate", f"{grant_rate:.2f}%")
 
 st.subheader("🏷 Trademark KPIs")
-# 2 columns
+col4, col5 = st.columns(2)
+col4.metric("🏷 Filed Trademark", filed_tm)
+col5.metric("🏷 Granted Trademark", granted_tm)
 
 st.subheader("© Copyright KPIs")
-# 2 columns
-tm_rate = (granted_tm / filed_tm * 100) if filed_tm else 0
-cr_rate = (granted_cr / filed_cr * 100) if filed_cr else 0
+col6, col7 = st.columns(2)
+col6.metric("© Filed Copyright", filed_cr)
+col7.metric("© Granted Copyright", granted_cr)
+
 
 # -------------------------------
 # CHARTS
