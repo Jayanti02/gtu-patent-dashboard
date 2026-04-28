@@ -317,13 +317,14 @@ grant_rate = (granted_patent / filed_patent * 100) if filed_patent > 0 else 0
 # -------------------------------
 filed_tm = df[(df["status"]=="Filed") & (df["ipr_type"]=="Trademark")].shape[0]
 granted_tm = df[(df["status"]=="Granted") & (df["ipr_type"]=="Trademark")].shape[0]
-
+tm_rate = (granted_tm / filed_tm * 100) if filed_tm else 0
 # -------------------------------
 # COPYRIGHT
 # -------------------------------
 filed_cr = df[(df["status"]=="Filed") & (df["ipr_type"]=="Copyright")].shape[0]
 granted_cr = df[(df["status"]=="Granted") & (df["ipr_type"]=="Copyright")].shape[0]
 
+cr_rate = (granted_cr / filed_cr * 100) if filed_cr else 0
 #DESIGN
 filed_design = df[(df["status"] == "Filed") & (df["ipr_type"] == "Design")].shape[0]
 granted_design = df[(df["status"] == "Granted") & (df["ipr_type"] == "Design")].shape[0]
