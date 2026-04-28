@@ -330,36 +330,6 @@ filed_design = df[(df["status"] == "Filed") & (df["ipr_type"] == "Design")].shap
 granted_design = df[(df["status"] == "Granted") & (df["ipr_type"] == "Design")].shape[0]
 
 design_rate = (granted_design / filed_design * 100) if filed_design > 0 else 0
-# -------------------------------
-# DISPLAY KPIs (7 cards)
-# -------------------------------
-
-st.subheader("📊 Patent KPIs")
-col1, col2, col3 = st.columns(3)
-col1.metric("📥 Filed Patent", filed_patent)
-col2.metric("✅ Granted Patent", granted_patent)
-col3.metric("📊 Grant Rate", f"{grant_rate:.2f}%")
-
-st.subheader("🏷 Trademark KPIs")
-col4, col5,col6 = st.columns(3)
-col4.metric("🏷 Filed Trademark", filed_tm)
-col5.metric("🏷 Granted Trademark", granted_tm)
-col6.metric("🏷 TM Grant %", f"{tm_rate:.1f}%")
-
-st.subheader("© Copyright KPIs")
-col7, col8,col9 = st.columns(3)
-col7.metric("© Filed Copyright", filed_cr)
-col8.metric("© Granted Copyright", granted_cr)
-col9.metric("© CR Grant %", f"{cr_rate:.1f}%")
-
-st.subheader("🎨 Design KPIs")
-
-col10, col11, col12 = st.columns(3)
-
-col10.metric("🎨 Filed Design", filed_design)
-col11.metric("🎨 Granted Design", granted_design)
-col12.metric("📊 Design Grant %", f"{design_rate:.2f}%")
-st.markdown("---")'''
 
 summary_df = pd.DataFrame({
     "IPR Type": ["Patent", "Trademark", "Copyright", "Design"],
