@@ -156,8 +156,8 @@ st.set_page_config(
 # -------------------------------
 # HEADER
 # -------------------------------
-st.title("📊 GTU Patent Analytics Dashboard")
-st.caption("Gujarat Technological University")
+#st.title("📊 GTU Patent Analytics Dashboard")
+#st.caption("Gujarat Technological University")
 
 # -------------------------------
 # FILE UPLOAD
@@ -263,17 +263,34 @@ if "year" in df.columns:
 
     df = df[df["year"].isin(selected_years)]
 # -------------------------------
-# KPI SECTION
+# CLEAN DATA (IMPORTANT)
 # -------------------------------
-filed = len(df[df["status"] == "Filed"])
-granted = len(df[df["status"] == "Granted"])
-rate = (granted / filed * 100) if filed else 0
+df["status"] = df["status"].astype(str).str.strip().str.title()
+df["ipr_type"] = df["ipr_type"].astype(str).str.strip().str.title()
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Filed Patents", filed)
-col2.metric("Granted Patents", granted)
-col3.metric("Grant Rate (%)", f"{rate:.2f}")
+# -------------------------------
+# MAIN KPIs
+# -------------------------------
+filed = df[df["status"] == "Filed"].shape[0]
+granted = df[df["status"] == "Granted"].shape[0]
+rate = (granted / filed * 100) if filed > 0 else 0
 
+# -------------------------------
+# IPR TYPE KPIs
+# -------------------------------
+trademark = df[df["ipr_type"].str.contains("Trademark", case=False, na=False)].shape[0]
+copyright_ = df[df["ipr_type"].str.contains("Copyright", case=False, na=False)].shape[0]
+
+# -------------------------------
+# DISPLAY KPIs
+# -------------------------------
+col1, col2, col3, col4, col5 = st.columns(5)
+
+col1.metric("📥 Filed", filed)
+col2.metric("✅ Granted", granted)
+col3.metric("📊 Grant Rate", f"{rate:.2f}%")
+col4.metric("🏷 Trademark", trademark)
+col5.metric("© Copyright", copyright_)
 st.divider()
 
 # -------------------------------
