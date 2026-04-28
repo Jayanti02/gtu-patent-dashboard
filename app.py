@@ -58,7 +58,20 @@ def process_file(file):
     # -------------------------------
     # FORCE NUMERIC
     # -------------------------------
-    df["year"] = pd.to_numeric(df["year"], errors="coerce")
+    # df["year"] = pd.to_numeric(df["year"], errors="coerce")
+    # -------------------------------
+    # SAFE YEAR EXTRACTION
+    # -------------------------------
+    if "year" in df.columns:
+        # Try numeric first
+        df["year"] = pd.to_numeric(df["year"], errors="coerce")
+
+    # If still many nulls → extract from date
+        if df["year"].isna().sum() > len(df) * 0.5:
+            for col in df.columns:
+                if "date" in col:
+                    df["year"] = pd.to_datetime(df[col], errors="coerce").dt.year
+                    break
 
     # -------------------------------
     # STATUS
