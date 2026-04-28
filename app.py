@@ -269,29 +269,67 @@ df["status"] = df["status"].astype(str).str.strip().str.title()
 df["ipr_type"] = df["ipr_type"].astype(str).str.strip().str.title()
 
 # -------------------------------
-# MAIN KPIs
+# CLEAN DATA (IMPORTANT)
 # -------------------------------
-filed = df[df["status"] == "Filed"].shape[0]
-granted = df[df["status"] == "Granted"].shape[0]
-rate = (granted / filed * 100) if filed > 0 else 0
+df["status"] = df["status"].astype(str).str.strip().str.title()
+df["ipr_type"] = df["ipr_type"].astype(str).str.strip().str.title()
+
+# Normalize IPR types (very important for GTU data)
+df["ipr_type"] = (
+    df["ipr_type"]
+    .str.lower()
+    .str.replace("copy r", "copyright")
+    .str.replace("trademark.*", "trademark", regex=True)
+    .str.replace("patent.*", "patent", regex=True)
+    .str.strip()
+    .str.title()
+)
 
 # -------------------------------
-# IPR TYPE KPIs
+# OVERALL KPIs
 # -------------------------------
-trademark = df[df["ipr_type"].str.contains("Trademark", case=False, na=False)].shape[0]
-copyright_ = df[df["ipr_type"].str.contains("Copyright", case=False, na=False)].shape[0]
+filed_patent = df[(df["status"]=="Filed") & (df["ipr_type"]=="Patent")].shape[0]
+granted_patent = df[(df["status"]=="Granted") & (df["ipr_type"]=="Patent")].shape[0]
+
+grant_rate = (granted_patent / filed_patent * 100) if filed_patent > 0 else 0
 
 # -------------------------------
-# DISPLAY KPIs
+# TRADEMARK
 # -------------------------------
-col1, col2, col3, col4, col5 = st.columns(5)
+filed_tm = df[(df["status"]=="Filed") & (df["ipr_type"]=="Trademark")].shape[0]
+granted_tm = df[(df["status"]=="Granted") & (df["ipr_type"]=="Trademark")].shape[0]
 
-col1.metric("📥 Filed", filed)
-col2.metric("✅ Granted", granted)
-col3.metric("📊 Grant Rate", f"{rate:.2f}%")
-col4.metric("🏷 Trademark", trademark)
-col5.metric("© Copyright", copyright_)
-st.divider()
+# -------------------------------
+# COPYRIGHT
+# -------------------------------
+filed_cr = df[(df["status"]=="Filed") & (df["ipr_type"]=="Copyright")].shape[0]
+granted_cr = df[(df["status"]=="Granted") & (df["ipr_type"]=="Copyright")].shape[0]
+
+# -------------------------------
+# DISPLAY KPIs (7 cards)
+# -------------------------------
+col1, col2, col3, col4 = st.columns(4)
+col5, col6, col7 = st.columns(3)
+
+col1.metric("📥 Filed Patent", filed_patent)
+col2.metric("✅ Granted Patent", granted_patent)
+col3.metric("📊 Grant Rate", f"{grant_rate:.2f}%")
+col4.metric("🏷 Filed Trademark", filed_tm)
+
+col5.metric("🏷 Granted Trademark", granted_tm)
+col6.metric("© Filed Copyright", filed_cr)
+col7.metric("© Granted Copyright", granted_cr)
+st.subheader("📊 Patent KPIs")
+# 3 columns
+
+st.subheader("🏷 Trademark KPIs")
+# 2 columns
+
+st.subheader("© Copyright KPIs")
+# 2 columns
+.str.replace(".*patent.*", "patent", regex=True)
+tm_rate = (granted_tm / filed_tm * 100) if filed_tm else 0
+cr_rate = (granted_cr / filed_cr * 100) if filed_cr else 0
 
 # -------------------------------
 # CHARTS
