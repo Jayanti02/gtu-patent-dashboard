@@ -273,25 +273,30 @@ if "year" in df.columns:
 # CLEAN DATA (IMPORTANT)
 # -------------------------------
 df["status"] = df["status"].astype(str).str.strip().str.title()
-df["ipr_type"] = df["ipr_type"].astype(str).str.strip().str.title()
+#df["ipr_type"] = df["ipr_type"].astype(str).str.strip().str.title()
 
 # -------------------------------
-# CLEAN DATA (IMPORTANT)
+# CLEAN IPR TYPES (FINAL FIX)
 # -------------------------------
-df["status"] = df["status"].astype(str).str.strip().str.title()
-df["ipr_type"] = df["ipr_type"].astype(str).str.strip().str.title()
-
-# Normalize IPR types (very important for GTU data)
 df["ipr_type"] = (
     df["ipr_type"]
+    .astype(str)
     .str.lower()
-    .str.replace("copy r", "copyright")
-    .str.replace("trademark.*", "trademark", regex=True)
-    .str.replace("patent.*", "patent", regex=True)
     .str.strip()
+
+    # Fix typos
+    .str.replace("copyrightght", "copyright", regex=False)
+    .str.replace("copy r", "copyright", regex=False)
+
+    # Normalize categories
+    .str.replace(".*copyright.*", "copyright", regex=True)
+    .str.replace(".*trademark.*", "trademark", regex=True)
+    .str.replace(".*patent.*", "patent", regex=True)
+    .str.replace(".*design.*", "design", regex=True)
+
+    # Final formatting
     .str.title()
 )
-
 # -------------------------------
 # OVERALL KPIs
 # -------------------------------
