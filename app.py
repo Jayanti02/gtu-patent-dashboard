@@ -355,8 +355,14 @@ summary_df.insert(0, "Sr. No.", range(1, len(summary_df) + 1))
 # -------------------------------
 # DISPLAY
 # -------------------------------
-st.dataframe(summary_df, width="stretch")
-
+#st.dataframe(summary_df, width="stretch")
+st.dataframe(
+    summary_df.style.set_properties(**{
+        'text-align': 'center'
+    }),
+    width="stretch",
+    hide_index=True
+)
 # -------------------------------
 # CHARTS
 # -------------------------------
