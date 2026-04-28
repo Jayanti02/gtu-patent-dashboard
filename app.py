@@ -159,13 +159,6 @@ st.set_page_config(
 #st.title("📊 GTU Patent Analytics Dashboard")
 #st.caption("Gujarat Technological University")
 
-st.markdown("""
----
-<center>
-Developed for Gujarat Technological University (GTU)  
-IPFC Initiative | Patent Analytics System
-</center>
-""", unsafe_allow_html=True)
 
 
 # -------------------------------
@@ -480,3 +473,11 @@ st.dataframe(df,width="stretch")
 #st.write(df.columns)
 #st.write("Columns:", df.columns.tolist())
 #st.write("Preview:", df.head())
+st.markdown("""
+---
+<center>
+Developed for Gujarat Technological University (GTU)  
+IPFC Initiative | Patent Analytics System
+</center>
+""", unsafe_allow_html=True)
+
