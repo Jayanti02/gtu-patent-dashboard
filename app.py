@@ -159,6 +159,15 @@ st.set_page_config(
 #st.title("📊 GTU Patent Analytics Dashboard")
 #st.caption("Gujarat Technological University")
 
+st.markdown("""
+---
+<center>
+Developed for Gujarat Technological University (GTU)  
+IPFC Initiative | Patent Analytics System
+</center>
+""", unsafe_allow_html=True)
+
+
 # -------------------------------
 # FILE UPLOAD
 # -------------------------------
@@ -297,9 +306,9 @@ df["ipr_type"] = (
     # Final formatting
     .str.title()
 )
-total_ipr = len(df)
+#total_ipr = len(df)
 
-st.metric("📁 Total IPR", total_ipr)
+#st.metric("📁 Total IPR", total_ipr)
 
 # -------------------------------
 # OVERALL KPIs
