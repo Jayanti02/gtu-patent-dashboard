@@ -304,7 +304,7 @@ df["ipr_type"] = (
 
 #st.metric("📁 Total IPR", total_ipr)
 
-'''# -------------------------------
+# -------------------------------
 # OVERALL KPIs
 # -------------------------------
 filed_patent = df[(df["status"]=="Filed") & (df["ipr_type"]=="Patent")].shape[0]
