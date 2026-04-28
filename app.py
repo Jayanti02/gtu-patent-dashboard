@@ -343,11 +343,13 @@ st.subheader("🏷 Trademark KPIs")
 col4, col5 = st.columns(2)
 col4.metric("🏷 Filed Trademark", filed_tm)
 col5.metric("🏷 Granted Trademark", granted_tm)
-
+col5.metric("🏷 TM Grant %", f"{tm_rate:.1f}%")
 st.subheader("© Copyright KPIs")
 col6, col7 = st.columns(2)
 col6.metric("© Filed Copyright", filed_cr)
 col7.metric("© Granted Copyright", granted_cr)
+col7.metric("© CR Grant %", f"{cr_rate:.1f}%")
+
 st.subheader("🎨 Design KPIs")
 
 col8, col9, col10 = st.columns(3)
