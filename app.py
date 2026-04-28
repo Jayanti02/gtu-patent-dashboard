@@ -347,11 +347,16 @@ total_row = pd.DataFrame({
 })
 
 summary_df = pd.concat([summary_df, total_row], ignore_index=True)
+# -------------------------------
+# ADD SERIAL NUMBER
+# -------------------------------
+summary_df.insert(0, "Sr. No.", range(1, len(summary_df) + 1))
 
 # -------------------------------
 # DISPLAY
 # -------------------------------
 st.dataframe(summary_df, width="stretch")
+
 # -------------------------------
 # CHARTS
 # -------------------------------
