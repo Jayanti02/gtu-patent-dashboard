@@ -315,17 +315,7 @@ granted_cr = df[(df["status"]=="Granted") & (df["ipr_type"]=="Copyright")].shape
 # -------------------------------
 # DISPLAY KPIs (7 cards)
 # -------------------------------
-col1, col2, col3, col4 = st.columns(4)
-col5, col6, col7 = st.columns(3)
 
-col1.metric("📥 Filed Patent", filed_patent)
-col2.metric("✅ Granted Patent", granted_patent)
-col3.metric("📊 Grant Rate", f"{grant_rate:.2f}%")
-col4.metric("🏷 Filed Trademark", filed_tm)
-
-col5.metric("🏷 Granted Trademark", granted_tm)
-col6.metric("© Filed Copyright", filed_cr)
-col7.metric("© Granted Copyright", granted_cr)
 st.subheader("📊 Patent KPIs")
 col1, col2, col3 = st.columns(3)
 col1.metric("📥 Filed Patent", filed_patent)
