@@ -468,7 +468,7 @@ pivot = df.groupby(["ipr_type", "status"]).size().reset_index(name="count")
 
 fig = px.bar(
     pivot,
-    x="ipr_type",
+    x="Types of IPR",
     y="count",
     color="status",
     barmode="group",
