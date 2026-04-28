@@ -378,8 +378,8 @@ st.divider()
 # -------------------------------
 # PIE CHART - IPR DISTRIBUTION
 # -------------------------------
-st.subheader("🥧 IPR Distribution: Filed vs Granted")
 
+st.subheader("📊 Filed vs Granted IPR Distribution")
 import plotly.express as px
 
 if "ipr_type" not in df.columns:
