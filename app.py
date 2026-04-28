@@ -304,7 +304,7 @@ df["ipr_type"] = (
 
 #st.metric("📁 Total IPR", total_ipr)
 
-# -------------------------------
+'''# -------------------------------
 # OVERALL KPIs
 # -------------------------------
 filed_patent = df[(df["status"]=="Filed") & (df["ipr_type"]=="Patent")].shape[0]
@@ -359,7 +359,29 @@ col10, col11, col12 = st.columns(3)
 col10.metric("🎨 Filed Design", filed_design)
 col11.metric("🎨 Granted Design", granted_design)
 col12.metric("📊 Design Grant %", f"{design_rate:.2f}%")
-st.markdown("---")
+st.markdown("---")'''
+
+summary_df = pd.DataFrame({
+    "IPR Type": ["Patent", "Trademark", "Copyright", "Design"],
+    "Filed": [filed_patent, filed_tm, filed_cr, filed_design],
+    "Granted": [granted_patent, granted_tm, granted_cr, granted_design],
+})
+
+# -------------------------------
+# ADD TOTAL ROW
+# -------------------------------
+total_row = pd.DataFrame({
+    "IPR Type": ["Total"],
+    "Filed": [summary_df["Filed"].sum()],
+    "Granted": [summary_df["Granted"].sum()],
+})
+
+summary_df = pd.concat([summary_df, total_row], ignore_index=True)
+
+# -------------------------------
+# DISPLAY
+# -------------------------------
+st.dataframe(summary_df, width="stretch")
 # -------------------------------
 # CHARTS
 # -------------------------------
