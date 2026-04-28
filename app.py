@@ -297,6 +297,10 @@ df["ipr_type"] = (
     # Final formatting
     .str.title()
 )
+total_ipr = len(df)
+
+st.metric("📁 Total IPR", total_ipr)
+
 # -------------------------------
 # OVERALL KPIs
 # -------------------------------
