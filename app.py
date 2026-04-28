@@ -327,7 +327,6 @@ st.subheader("🏷 Trademark KPIs")
 
 st.subheader("© Copyright KPIs")
 # 2 columns
-.str.replace(".*patent.*", "patent", regex=True)
 tm_rate = (granted_tm / filed_tm * 100) if filed_tm else 0
 cr_rate = (granted_cr / filed_cr * 100) if filed_cr else 0
 
