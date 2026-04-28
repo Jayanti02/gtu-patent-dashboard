@@ -456,7 +456,8 @@ selected_status = st.selectbox("Select Status", ["Filed", "Granted"])
 
 filtered = df[df["status"] == selected_status]
 
-counts = filtered["Type of IPR"].value_counts().reset_index()
+#counts = filtered["Type of IPR"].value_counts().reset_index()
+counts = filtered["ipr_type"].value_counts().reset_index()
 counts.columns = ["IPR Type", "Count"]
 
 fig = px.pie(counts, names="IPR Type", values="Count", hole=0.4)
