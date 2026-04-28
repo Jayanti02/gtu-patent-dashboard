@@ -299,6 +299,7 @@ df["ipr_type"] = (
     # Final formatting
     .str.title()
 )
+
 #total_ipr = len(df)
 
 #st.metric("📁 Total IPR", total_ipr)
@@ -323,6 +324,11 @@ granted_tm = df[(df["status"]=="Granted") & (df["ipr_type"]=="Trademark")].shape
 filed_cr = df[(df["status"]=="Filed") & (df["ipr_type"]=="Copyright")].shape[0]
 granted_cr = df[(df["status"]=="Granted") & (df["ipr_type"]=="Copyright")].shape[0]
 
+#DESIGN
+filed_design = df[(df["status"] == "Filed") & (df["ipr_type"] == "Design")].shape[0]
+granted_design = df[(df["status"] == "Granted") & (df["ipr_type"] == "Design")].shape[0]
+
+design_rate = (granted_design / filed_design * 100) if filed_design > 0 else 0
 # -------------------------------
 # DISPLAY KPIs (7 cards)
 # -------------------------------
@@ -342,7 +348,13 @@ st.subheader("© Copyright KPIs")
 col6, col7 = st.columns(2)
 col6.metric("© Filed Copyright", filed_cr)
 col7.metric("© Granted Copyright", granted_cr)
+st.subheader("🎨 Design KPIs")
 
+col8, col9, col10 = st.columns(3)
+
+col8.metric("🎨 Filed Design", filed_design)
+col9.metric("🎨 Granted Design", granted_design)
+col10.metric("📊 Design Grant %", f"{design_rate:.2f}%")
 st.markdown("---")
 # -------------------------------
 # CHARTS
