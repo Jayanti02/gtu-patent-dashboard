@@ -341,23 +341,24 @@ col2.metric("✅ Granted Patent", granted_patent)
 col3.metric("📊 Grant Rate", f"{grant_rate:.2f}%")
 
 st.subheader("🏷 Trademark KPIs")
-col4, col5 = st.columns(2)
+col4, col5,col6 = st.columns(3)
 col4.metric("🏷 Filed Trademark", filed_tm)
 col5.metric("🏷 Granted Trademark", granted_tm)
-col5.metric("🏷 TM Grant %", f"{tm_rate:.1f}%")
+col6.metric("🏷 TM Grant %", f"{tm_rate:.1f}%")
+
 st.subheader("© Copyright KPIs")
-col6, col7 = st.columns(2)
-col6.metric("© Filed Copyright", filed_cr)
-col7.metric("© Granted Copyright", granted_cr)
-col7.metric("© CR Grant %", f"{cr_rate:.1f}%")
+col7, col8,col9 = st.columns(3)
+col7.metric("© Filed Copyright", filed_cr)
+col8.metric("© Granted Copyright", granted_cr)
+col9.metric("© CR Grant %", f"{cr_rate:.1f}%")
 
 st.subheader("🎨 Design KPIs")
 
-col8, col9, col10 = st.columns(3)
+col10, col11, col12 = st.columns(3)
 
-col8.metric("🎨 Filed Design", filed_design)
-col9.metric("🎨 Granted Design", granted_design)
-col10.metric("📊 Design Grant %", f"{design_rate:.2f}%")
+col10.metric("🎨 Filed Design", filed_design)
+col11.metric("🎨 Granted Design", granted_design)
+col12.metric("📊 Design Grant %", f"{design_rate:.2f}%")
 st.markdown("---")
 # -------------------------------
 # CHARTS
