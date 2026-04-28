@@ -131,7 +131,7 @@ with col2:
 col1, col2, col3 = st.columns([1, 6, 1])
 
 with col1:
-    st.image("https://www.gtu.ac.in/images/logo.png", width=80)
+    st.image("gtu-logo.png", width=80)
 
 with col2:
     st.markdown("""
@@ -144,7 +144,7 @@ with col2:
     """, unsafe_allow_html=True)
 
 with col3:
-    st.image("https://ipfc.gtu.ac.in/assets/img/ipfc_logo.png", width=80)
+    st.image("IPFC.png", width=80)
 # -------------------------------
 # PAGE CONFIG
 # -------------------------------
