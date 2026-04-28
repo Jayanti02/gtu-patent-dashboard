@@ -251,6 +251,12 @@ df["status"] = df["status"].astype(str).str.title()
 st.sidebar.header("Filters")
 
 if "year" in df.columns:
+    df["year"] = pd.to_numeric(df["year"], errors="coerce")
+
+    # Drop missing years (recommended)
+    df = df.dropna(subset=["year"])
+
+# Convert safely
     df["year"] = df["year"].astype(int)
 
     years = sorted(df["year"].dropna().unique())
