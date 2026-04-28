@@ -331,21 +331,7 @@ st.subheader("© Copyright KPIs")
 col6, col7 = st.columns(2)
 col6.metric("© Filed Copyright", filed_cr)
 col7.metric("© Granted Copyright", granted_cr)
-total_ipr = len(df)
 
-st.metric("📁 Total IPR", total_ipr)
-tm_rate = (granted_tm / filed_tm * 100) if filed_tm else 0
-cr_rate = (granted_cr / filed_cr * 100) if filed_cr else 0
-col5.metric("🏷 TM Grant %", f"{tm_rate:.1f}%")
-col7.metric("© CR Grant %", f"{cr_rate:.1f}%")
-st.info(f"""
-📌 Insights:
-• Patent Grant Rate: {grant_rate:.2f}%
-• Trademark Activity: {filed_tm} filings
-• Copyright Activity: {filed_cr} filings
-
-👉 Most active IPR: {df['ipr_type'].mode()[0]}
-""")
 st.markdown("---")
 # -------------------------------
 # CHARTS
