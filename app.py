@@ -389,7 +389,18 @@ col1.metric("🏆 Total Granted Patents", total_granted_patents)
 col2.metric("📅 Granted Patents (2025–26)", granted_2025)
 col3.metric("📚 IPR Activities (2025–26)", 0)
 col4.metric("💰 Fund Supported Filings", funded_cases)
+# Clean status column
+df["status"] = (
+    df["status"]
+    .astype(str)
+    .str.strip()
+    .str.lower()
+)
 
+# Count granted safely
+granted_count = df[df["status"].str.contains("grant", na=False)].shape[0]
+
+st.metric("✅ Total Granted IPR", granted_count)
 st.markdown("---")
 # -------------------------------
 # OVERALL KPIs
