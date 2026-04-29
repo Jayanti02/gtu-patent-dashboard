@@ -222,8 +222,8 @@ if uploaded_files:
 # -------------------------------
 if dataframes:
     df = pd.concat(dataframes, ignore_index=True)
-    df = df.drop_duplicates()
-
+    #df = df.drop_duplicates()
+    df = df.drop_duplicates(subset=["sr_no"])
     try:
         df.to_sql("gtu_patents", engine, if_exists="replace", index=False)
         st.success("✅ Database updated successfully")
