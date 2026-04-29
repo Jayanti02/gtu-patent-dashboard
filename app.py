@@ -257,7 +257,25 @@ if "ipr_type" not in df.columns:
 
 df["ipr_type"] = df["ipr_type"].astype(str).str.strip().str.title()
 df["status"] = df["status"].astype(str).str.title()
+df.columns = (
+    df.columns
+    .str.strip()
+    .str.lower()
+    .str.replace(" ", "_")
+    .str.replace(".", "_")
+)
+st.write(df.columns.tolist())
+id_col = None
 
+for col in df.columns:
+    if "sr" in col and "no" in col:
+        id_col = col
+        break
+if id_col:
+    df_unique = df.drop_duplicates(subset=[id_col])
+else:
+    st.warning("Serial number column not found, using full dataset")
+    df_unique = df.copy()       
 
 # SIDEBAR FILTERS
 # -------------------------------
