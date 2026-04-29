@@ -422,37 +422,6 @@ st.dataframe(
     hide_index=True
 )
 
-df = df.rename(columns={
-    "assignee/s_name_(institute_affiliation/s_at_time_of_application": "institute"
-})
-df["institute"] = (
-    df["institute"]
-    .astype(str)
-    .str.lower()
-    .str.strip()
-)
-
-df["status"] = (
-    df["status"]
-    .astype(str)
-    .str.lower()
-    .str.strip()
-)
-gtu_granted = df[
-    (df["status"].str.contains("grant", na=False)) &
-    (
-        df["institute"].str.contains("gujarat technological university", na=False) |
-        df["institute"].str.contains("gtu", na=False)
-    )
-].shape[0]
-st.metric("🏛️ Granted IPR (GTU)", gtu_granted)
-gtu_granted = df_unique[
-    (df_unique["status"].str.contains("grant", na=False)) &
-    (
-        df_unique["institute"].str.contains("gujarat technological university", na=False) |
-        df_unique["institute"].str.contains("gtu", na=False)
-    )
-].shape[0]
 # -------------------------------
 # CHARTS
 # -------------------------------
