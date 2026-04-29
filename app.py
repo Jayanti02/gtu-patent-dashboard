@@ -376,6 +376,13 @@ st.dataframe(
     width="stretch",
     hide_index=True
 )
+
+total_granted_patents = df_unique[
+    (df_unique["ipr_type"] == "Patent") &
+    (df_unique["status"] == "Granted")
+].shape[0]
+
+st.metric("🏆 Total Granted Patents (GTU)", total_granted_patents)
 # -------------------------------
 # CHARTS
 # -------------------------------
@@ -510,12 +517,7 @@ st.dataframe(df,width="stretch")
 #st.write("Preview:", df.head())
 st.markdown("""
 ---
-total_granted_patents = df_unique[
-    (df_unique["ipr_type"] == "Patent") &
-    (df_unique["status"] == "Granted")
-].shape[0]
 
-st.metric("🏆 Total Granted Patents (GTU)", total_granted_patents)
 
 <center>
 Developed for Gujarat Technological University (GTU)  
