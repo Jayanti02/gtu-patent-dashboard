@@ -353,39 +353,7 @@ df["ipr_type"] = (
     # Final formatting
     .str.title()
 )
-# -------------------------------
-# GTU OFFICIAL METRICS
-# -------------------------------
-st.subheader("📊 GTU Official Metrics (R&D)")
-# Clean status column
-df["status"] = (
-    df["status"]
-    .astype(str)
-    .str.strip()
-    .str.lower()
-)
-# Count granted safely
-granted_count = df[df["status"].str.contains("grant", na=False)].shape[0]
-granted_2025 = df_unique[
-    (df_unique["ipr_type"] == "Patent") &
-    (df_unique["status"] == "Granted") &
-    (df_unique["year"] == 2025)
-].shape[0]
 
-funded_cases = df_unique[
-    (df_unique["year"] == 2025) &
-    (df_unique["funding"] != "None")
-].shape[0]
-
-col1, col2 = st.columns(2)
-col3, col4 = st.columns(2)
-
-col1.metric("🏆 Total Granted IPR",granted_count)
-col2.metric("📅 Granted Patents (2025–26)", granted_2025)
-col3.metric("📚 IPR Activities (2025–26)", 0)
-col4.metric("💰 Fund Supported Filings", funded_cases)
-
-st.markdown("---")
 #total_ipr = len(df)
 
 #st.metric("📁 Total IPR", total_ipr)
