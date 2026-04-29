@@ -276,7 +276,29 @@ if id_col:
 else:
     st.warning("Serial number column not found, using full dataset")
     df_unique = df.copy()       
+# Clean column names
+df.columns = (
+    df.columns
+    .str.strip()
+    .str.lower()
+    .str.replace(" ", "_")
+    .str.replace(".", "_")
+)
 
+# Rename key columns
+df = df.rename(columns={
+    "financial_support_type_(self/ssip/dic/gtu/others)": "funding"
+})
+
+# Detect ID column
+id_col = None
+for col in df.columns:
+    if "sr" in col and "no" in col:
+        id_col = col
+        break
+
+# Remove duplicates
+df_unique = df.drop_duplicates(subset=[id_col]) if id_col else df.copy()
 # SIDEBAR FILTERS
 # -------------------------------
 st.sidebar.header("Filters")
