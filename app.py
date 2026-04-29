@@ -358,8 +358,9 @@ df["ipr_type"] = (
 
 #st.metric("📁 Total IPR", total_ipr)
 # AFTER df is created
-df_unique = df.drop_duplicates(subset=["sr_no"])
-
+#df_unique = df.drop_duplicates(subset=["sr_no"])
+df = df.rename(columns={"sr__no_": "id"})
+df_unique = df.drop_duplicates(subset=["id"])
 # -------------------------------
 # GTU OFFICIAL METRICS
 # -------------------------------
