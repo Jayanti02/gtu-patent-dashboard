@@ -186,7 +186,17 @@ try:
     df = pd.read_sql("SELECT * FROM gtu_patents", engine)
 except:
     pass
+df = df.rename(columns={
+    "Type of IPR": "ipr_type",
+    "type_of_ipr": "ipr_type"
+})
 
+df.columns = (
+    df.columns
+    .str.strip()
+    .str.lower()
+    .str.replace(" ", "_")
+)
 # -------------------------------
 # PROCESS UPLOAD
 # -------------------------------
@@ -276,6 +286,9 @@ if "year" in df.columns:
 # -------------------------------
 df["status"] = df["status"].astype(str).str.strip().str.title()
 #df["ipr_type"] = df["ipr_type"].astype(str).str.strip().str.title()
+# Remove junk columns
+df = df.loc[:, ~df.columns.str.contains("unnamed")]
+
 
 # -------------------------------
 # CLEAN IPR TYPES (FINAL FIX)
@@ -455,9 +468,11 @@ st.plotly_chart(fig,width="stretch")
 selected_status = st.selectbox("Select Status", ["Filed", "Granted"])
 
 filtered = df[df["status"] == selected_status]
-
-#counts = filtered["Type of IPR"].value_counts().reset_index()
-counts = filtered["ipr_type"].value_counts().reset_index()
+if "ipr_type" in filtered.columns:
+    counts = filtered["ipr_type"].value_counts().reset_index()
+else:
+    st.error("IPR type column not found")
+    st.stop()
 counts.columns = ["IPR Type", "Count"]
 
 fig = px.pie(counts, names="IPR Type", values="Count", hole=0.4)
