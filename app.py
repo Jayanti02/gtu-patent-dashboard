@@ -353,14 +353,6 @@ df["ipr_type"] = (
     # Final formatting
     .str.title()
 )
-
-#total_ipr = len(df)
-
-#st.metric("📁 Total IPR", total_ipr)
-# AFTER df is created
-#df_unique = df.drop_duplicates(subset=["sr_no"])
-df = df.rename(columns={"sr__no_": "id"})
-df_unique = df.drop_duplicates(subset=["id"])
 # -------------------------------
 # GTU OFFICIAL METRICS
 # -------------------------------
@@ -394,6 +386,14 @@ col3.metric("📚 IPR Activities (2025–26)", 0)
 col4.metric("💰 Fund Supported Filings", funded_cases)
 
 st.markdown("---")
+#total_ipr = len(df)
+
+#st.metric("📁 Total IPR", total_ipr)
+# AFTER df is created
+#df_unique = df.drop_duplicates(subset=["sr_no"])
+df = df.rename(columns={"sr__no_": "id"})
+df_unique = df.drop_duplicates(subset=["id"])
+
 # -------------------------------
 # OVERALL KPIs
 # -------------------------------
