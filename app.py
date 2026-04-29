@@ -264,7 +264,7 @@ df.columns = (
     .str.replace(" ", "_")
     .str.replace(".", "_")
 )
-st.write(df.columns.tolist())
+#st.write(df.columns.tolist())
 id_col = None
 
 for col in df.columns:
